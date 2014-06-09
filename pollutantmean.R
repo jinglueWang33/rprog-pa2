@@ -10,20 +10,37 @@ pollutantmean <- function(directory, pollutant, id = 1:332) {
         ## to be used
 
         ## Return the mean of the pollutant across all monitors list
-        ## in the 'id' vector (ignoring NA values)
+        ## in the 'id' vector (ignoring NA values)f
 		
 		## string format????
 		## read a lot of files at the same time????
 		
+    pollutdata <- NULL
+    
 		for (i in id) {
-				pollutdata <- read.csv(directory + as.character(i) + ".csv", header=TRUE)
-				pollutdata <- rbind(pollutdata, pollutdata)
+      
+        if (nchar(as.character(i)) == 1) {
+            filename <- paste(directory, "/00", i, ".csv", sep="")
+        }else if (nchar(as.character(i)) == 2){
+            filename <- paste(directory, "/0", i, ".csv", sep="")
+        }else if (nchar(as.character(i)) == 3){
+            filename <- paste(directory, "/", i, ".csv", sep="")
+        }       
+        
+        
+				newpollutdata <- read.csv(filename, header=TRUE)
+        head(newpollutdata)
+				pollutdata <- rbind(pollutdata, newpollutdata)
 		}
 		
+    m <- 0
+    
 		if (pollutant == "sulfate") {				
-				return mean(pollutant[!is.na(pollutant$sulfate)]$sulfate)
+				m <- mean(pollutdata$sulfate[!is.na(pollutdata$sulfate)])
 		}else if (pollutant == "nitrate") {
-				return mean(pollutant[!is.na(pollutant$nitrate)]$nitrate)		
+				m <- mean(pollutdata$nitrate[!is.na(pollutdata$nitrate)])		
 		}
+    
+    m
 		
 }

@@ -13,12 +13,28 @@ complete <- function(directory, id = 1:332) {
         ## where 'id' is the monitor ID number and 'nobs' is the
         ## number of complete cases
 		
+    pollutdata <- NULL
+    resultdata <- NULL
+    
 		for (i in id) {
-				pollutdata <- read.csv(directory + as.character(i) + ".csv", header=TRUE)
+      
+  		  if (nchar(as.character(i)) == 1) {
+  		    filename <- paste(directory, "/00", i, ".csv", sep="")
+  		  }else if (nchar(as.character(i)) == 2){
+  		    filename <- paste(directory, "/0", i, ".csv", sep="")
+  		  }else if (nchar(as.character(i)) == 3){
+  		    filename <- paste(directory, "/", i, ".csv", sep="")
+  		  }    
+      
+				pollutdata <- read.csv(filename, header=TRUE)
 				
-				nobs = count(pollutdata[!is.na(pollutdata$sulfate) && !is.na(pollutdata$nitrate)])
-				
-				resultdata <- resultdata.attach(id = i, nobs = nobs)				
+				validcnt = sum(!is.na(pollutdata$sulfate) & !is.na(pollutdata$nitrate))
+        
+        if (is.null(resultdata)){
+            resultdata <- data.frame(id = i, nobs = validcnt)  
+        }else {
+					  resultdata <- rbind(resultdata, c(id = i, nobs = validcnt))
+        }
 		}
 		
 		resultdata
